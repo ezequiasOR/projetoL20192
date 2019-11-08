@@ -16,12 +16,21 @@ assert testMoradorSemVeiculos {
   all m:Morador | #(m.veiculos) > 0
 }
 
-check testMoradorSemVeiculos
+assert testMoradorMaxVeiculos {
+  all m:Morador | #(m.veiculos) < 4
+}
 
-TESTES QUE FALTAM:
+assert testCondonimioMinQtdVagasOcupadas {
+  all c:Condominio | #(c.vagas) > -1
+}
+
+check testMoradorSemVeiculos
+check testMoradorMaxVeiculos
+check testCondonimioMinQtdVagasOcupadas
+
+ALGUNS TESTES QUE FALTAM:
 
   - um veiculo so pode pertencer a um morador
-  - um morador pode ter no max 3 veiculos
   - um veiculo tem que ter um dono (um morador)
 
 */
