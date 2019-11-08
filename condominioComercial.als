@@ -1,5 +1,9 @@
 module condominioComercial
 
+sig Condominio {
+	vagas: set Veiculo
+}
+
 sig Morador {
   veiculos: some Veiculo
 }
