@@ -1,14 +1,40 @@
 module condominioComercial
 
-sig Condominio {
-	vagas: set Veiculo
+sig Portao {
+  cancela: #cancela = 2
 }
 
 sig Morador {
   veiculos: some Veiculo
 }
 
-sig Veiculo {}
+sig Estacionamento {
+  veiculos: some Veiculo
+  vaga: some Vagas
+}
+
+sig Veiculo {
+  autorizacao: one Autorizacao
+}
+
+abstract Autorizacao{
+  validade: some dias
+}
+
+sig AutorizacaoProprietario extends Autorizacao {
+  validade: #dias = 30
+}
+
+sig AutorizacaoVisita extends Autorizacao {
+  validade: #dias = 1
+}
+
+sig Condominio {
+  morador: some Morador
+  portao: one Portao
+  estacionamento: one Estacionamento
+}
+
 
 
 /*
