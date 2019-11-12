@@ -1,10 +1,11 @@
 module condominioComercial
 
-sig Portao {
-  cancelas: #cancela = 2
+sig Condominio {
+  morador: set Morador,
+  estacionamento: one Estacionamento
 }
 
-sig cancela {}
+sig Cancela {}
 
 sig Morador {
   veiculos: some Veiculo
@@ -12,13 +13,13 @@ sig Morador {
 
 sig Estacionamento {
   veiculos: some Veiculo,
-  Vagas: #vagas = 30
+  cancelas: some Cancela
 }
 
 sig Veiculo {
-  autorizacao: one Autorizacao
+ // autorizacao: one Autorizacao
 }
-
+/*
 abstract sig Autorizacao{
   validade: some dias
 }
@@ -30,14 +31,20 @@ sig AutorizacaoProprietario extends Autorizacao {
 sig AutorizacaoVisita extends Autorizacao {
   validade: #dias = 1
 }
+*/
 
-sig Condominio {
-  morador: some Morador,
-  portao: one Portao,
-  estacionamento: one Estacionamento
+fact existenciaCondominio {					// existe um condominio
+  all c:Condominio | #(c) = 1
 }
 
+fact qtdCancelas {							// a qtd de cancelas eh 2
+  all e:Estacionamento | #(e.cancelas) = 2
+}
 
+fact qtdVagas {							// tem no minimo 0 vagas ocupadas e no maximo 30
+  all e:Estacionamento | #(e.veiculos) > 0
+  all e:Estacionamento | #(e.veiculos) < 31
+}
 
 /*
 assert testMoradorSemVeiculos {
