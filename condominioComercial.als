@@ -3,7 +3,6 @@ module condominioComercial
 one sig Condominio{
   morador: set Morador,
   estacionamento: one Estacionamento
-
 }
 
 one sig Estacionamento {
@@ -12,11 +11,18 @@ one sig Estacionamento {
 
 sig Cancela {}
 
-sig Morador {
+abstract sig Pessoa {
+  veiculos: some Veiculo
 }
 
-fact existenciaCondominio {					// existe um condominio
-  all c:Condominio | #(c) = 1
+sig Morador extends Pessoa {}
+
+sig Visitante extends Pessoa {}
+
+sig Veiculo {}
+
+fact todoVeiculoPertenceAUmMorador{
+  all v: Veiculo | one v.~veiculos
 }
 
 fact todaCancelaPertenceAUmEstacionamento{
