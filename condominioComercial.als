@@ -62,8 +62,9 @@ fact TodaCancelaTaEmUmPortao {
   all c:Cancela | c in Portao.cancelaE or c in Portao.cancelaS
 }
 
-fact MoradorTemAteTresVeiculos{
-	all m: Morador | #proprietario.m <= 3
+fact MoradorTemNoMinUmEAteTresVeiculos{
+	all m: Morador | #proprietario.m > 0
+	all m: Morador | #proprietario.m < 4
 }
 
 fact VisitanteTemApenasUmCarro{
@@ -72,6 +73,11 @@ fact VisitanteTemApenasUmCarro{
 
 fact VeiculoEDeMoradorOuDeVisitante{
 	all v: Veiculo | v in Estacionamento.vagasMoradores => !(v in  Estacionamento.vagasVisitantes)
+}
+
+fact TodoVeiculoEstaNaGaragem {
+	all m:Morador | proprietario.m in Estacionamento.vagasMoradores
+	all v:Visitante | proprietario.v in Estacionamento.vagasVisitantes
 }
 
 pred show[] {
