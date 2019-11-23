@@ -1,68 +1,77 @@
 module condominioComercial
 
 one sig Condominio{
-  morador: set Morador,
-  estacionamento: one Estacionamento
+	morador:		some Morador,
+	portao:		one Portao,
+	estacionamento:	one Estacionamento
 }
 
-one sig Estacionamento {
-  cancelas: some Cancela,
-  veiculosEstac: some Veiculo
+one sig Portao {
+	cancelaE:	one Cancela,				// cancela de entrada 
+	cancelaS: 	one Cancela,				// cancela de saida
+	semaforoE: 	one Semaforo,				// semaforo de entrada
+	semaforoS:	one Semaforo				// semaforo de saida
 }
 
 sig Cancela {}
 
-abstract sig Pessoa {
-  autorizacaoM: set AutorizacaoMorador,
-  autorizacaoV: set AutorizacaoVisitante,
-  veiculos: some Veiculo
+sig Semaforo {}
+
+one sig Estacionamento {
+	vagasMoradores:	 set Veiculo,
+	vagasVisitantes:	 set Veiculo
 }
+
+sig Veiculo {
+	proprietario: one Pessoa
+}
+
+abstract sig Pessoa {}
 
 sig Morador extends Pessoa {}
 
-sig Visitante extends Pessoa {}
+sig Visitante extends Pessoa {
+	visita: one Morador
+}
 
-abstract sig Autorizacao{}
+fun GetCondominioMorador[m:Morador]: one Condominio {
+	morador.m
+}
 
-sig AutorizacaoMorador extends Autorizacao{}
-
-sig AutorizacaoVisitante extends Autorizacao{}
-
-sig Veiculo {}
-
-fact todoVeiculoPertenceAUmaPessoa{
-  all v: Veiculo | one v.~veiculos
+fun GetGaragemVisitado[v:Visitante]: one Estacionamento {
+	GetCondominioMorador[v.visita].estacionamento
 }
 
 fact todoMoradorPertenceAUmCondominio{
-  all m: Morador | one m.~morador
+	all m:Morador | #morador.m = 1
 }
 
-fact qtdCancelas {							// a qtd de cancelas eh 2
-  all e:Estacionamento | #(e.cancelas) = 2
+fact cancelaEDifetenteDeCancelaS {
+  all p:Portao | p.cancelaE != p.cancelaS
 }
 
-fact todaAutMoradorPertenceAUmaPessoa{
-    all a: AutorizacaoMorador | one a.~autorizacaoM
+fact semaforoEDiferenteSemaforoS {
+  all p:Portao | p.semaforoE != p.semaforoS
 }
 
-fact todaAutVisitantePertenceAUmaPessoa{
-    all a: AutorizacaoVisitante | one a.~autorizacaoV
+fact TodoSemaforoTaEmUmPortao {
+  all s:Semaforo | s in Portao.semaforoE or s in Portao.semaforoS
 }
 
---fact qtdVagas {							// tem no minimo 0 vagas ocupadas e no maximo 30
---  all e:Estacionamento | #(e.veiculosEstac) > -1
---  all e:Estacionamento | #(e.veiculosEstac) < 31
---}
-
-pred AutorizacaoMorador[m:Morador]{
-    #m.autorizacaoM <= 1
-    #m.autorizacaoV <= 0
+fact TodaCancelaTaEmUmPortao {
+  all c:Cancela | c in Portao.cancelaE or c in Portao.cancelaS
 }
 
-pred AutorizacaoVisitante[v:Visitante]{
-    #v.autorizacaoM <= 0
-    #v.autorizacaoV <= 1
+fact MoradorTemAteTresVeiculos{
+	all m: Morador | #proprietario.m <= 3
+}
+
+fact VisitanteTemApenasUmCarro{
+	all v: Visitante | #proprietario.v= 1
+}
+
+fact VeiculoEDeMoradorOuDeVisitante{
+	all v: Veiculo | v in Estacionamento.vagasMoradores => !(v in  Estacionamento.vagasVisitantes)
 }
 
 pred show[] {
