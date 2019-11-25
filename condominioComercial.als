@@ -36,11 +36,11 @@ sig Visitante extends Pessoa {
 
 abstract sig Autorizacao {}
 
-sig AutorizacaoMorador extends Autorizacao {
+sig AutorizacaoTrintaDias extends Autorizacao {
 	veiculoMorador: one Veiculo
 }
 
-sig AutorizacaoVisitante extends Autorizacao {
+sig AutorizacaoUmDia extends Autorizacao {
 	veiculoVisitante: one Veiculo
 }
 
@@ -48,7 +48,7 @@ fun GetCondominioMorador[m:Morador]: one Condominio {
 	morador.m
 }
 
-fun GetGaragemVisitado[v:Visitante]: one Estacionamento {
+fun GetEstacionamentoVisitado[v:Visitante]: one Estacionamento {
 	GetCondominioMorador[v.visita].estacionamento
 }
 
@@ -85,18 +85,29 @@ fact VeiculoEDeMoradorOuDeVisitante{
 	all v: Veiculo | v in Estacionamento.vagasMoradores => !(v in  Estacionamento.vagasVisitantes)
 }
 
-fact TodoVeiculoEstaNaGaragem {
+fact TodoVeiculoEstaNoEstacionamento {
 	all m:Morador | proprietario.m in Estacionamento.vagasMoradores
 	all v:Visitante | proprietario.v in Estacionamento.vagasVisitantes
 }
 
-fact todoVeiculoMorTemUmaAutoMorador{
-	all v:Veiculo | #veiculoMorador.v = 1
+fact todoVeiculoMorTemUmaAutoDeTrintaDias{
+	all v:Veiculo | v in AutorizacaoTrintaDias.veiculoMorador => v.proprietario in  Condominio.morador
 }
--- TODO: todo visitante tem que ter autorizacao visitante
--- TODO: visitante nao pode ter autorizacao morador
--- TODO: morador nao pode ter autorizacao visitante
---
+
+fact todoVeiculoVisTemUmaAutoDeUmDia{
+	all v:Veiculo | v in AutorizacaoUmDia.veiculoVisitante => !(v.proprietario in  Condominio.morador)
+}
+
+fact todoVeiculoTemApenasUmaAutorizacao{
+	all v:Veiculo | v in AutorizacaoTrintaDias.veiculoMorador or v in AutorizacaoUmDia.veiculoVisitante
+}
+
+fact AutorizacaoTemApenasUmVeiculo{
+	all atd: AutorizacaoTrintaDias | #atd.veiculoMorador = 1
+	all aud: AutorizacaoUmDia | #aud.veiculoVisitante = 1
+	all vm: Veiculo | #veiculoMorador.vm <= 1
+	all vv: Veiculo | #veiculoVisitante.vv <= 1
+}
 
 -- TODO: FALTA OS ASSERTS AQUI
 
