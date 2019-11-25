@@ -34,6 +34,16 @@ sig Visitante extends Pessoa {
 	visita: one Morador
 }
 
+abstract sig Autorizacao {}
+
+sig AutorizacaoMorador extends Autorizacao {
+	veiculoMorador: one Veiculo
+}
+
+sig AutorizacaoVisitante extends Autorizacao {
+	veiculoVisitante: one Veiculo
+}
+
 fun GetCondominioMorador[m:Morador]: one Condominio {
 	morador.m
 }
@@ -79,6 +89,16 @@ fact TodoVeiculoEstaNaGaragem {
 	all m:Morador | proprietario.m in Estacionamento.vagasMoradores
 	all v:Visitante | proprietario.v in Estacionamento.vagasVisitantes
 }
+
+fact todoVeiculoMorTemUmaAutoMorador{
+	all v:Veiculo | #veiculoMorador.v = 1
+}
+-- TODO: todo visitante tem que ter autorizacao visitante
+-- TODO: visitante nao pode ter autorizacao morador
+-- TODO: morador nao pode ter autorizacao visitante
+--
+
+-- TODO: FALTA OS ASSERTS AQUI
 
 pred show[] {
 }
