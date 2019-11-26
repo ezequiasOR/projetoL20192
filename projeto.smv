@@ -1,4 +1,4 @@
 MODULE main
 VAR
 	Pessoa:{Morador,Visitante};
-	
+	Autorizacao:{AutorizacaoTrintaDias,AutorizacaoUmDia};
