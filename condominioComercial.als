@@ -44,6 +44,7 @@ sig AutorizacaoUmDia extends Autorizacao {
 	veiculoVisitante: one Veiculo
 }
 
+-- FUNCOES
 fun GetCondominioMorador[m:Morador]: one Condominio {
 	morador.m
 }
@@ -52,6 +53,7 @@ fun GetEstacionamentoVisitado[v:Visitante]: one Estacionamento {
 	GetCondominioMorador[v.visita].estacionamento
 }
 
+-- FACTS
 fact todoMoradorPertenceAUmCondominio{
 	all m:Morador | #morador.m = 1
 }
@@ -109,7 +111,79 @@ fact AutorizacaoTemApenasUmVeiculo{
 	all vv: Veiculo | #veiculoVisitante.vv <= 1
 }
 
--- TODO: FALTA OS ASSERTS AQUI
+-- ASSERTS
+assert visitanteTemApenasUmCarro{
+	all v: Visitante | #proprietario.v= 1
+}
+
+assert moradorTemNoMinUmEAteTresVeiculos{
+	all m: Morador | #proprietario.m > 0
+	all m: Morador | #proprietario.m < 4
+}
+
+assert veiculoEDeMoradorOuEDeVisitante{
+	all v: Veiculo | v in Estacionamento.vagasMoradores => !(v in  Estacionamento.vagasVisitantes)
+}
+
+assert veiculoNaoEVisitanteEDeMorador {
+	all e1:Estacionamento | all e2:Estacionamento | !(e1 = e2) => #(e2.vagasVisitantes & e1.vagasMoradores) = 0
+}
+
+assert todaCancelaEstaEmUmPortao {
+	all c:Cancela | c in Portao.cancelaS or c in Portao.cancelaE
+}
+
+assert cancelaDaEntradaEDiferenteDaCancelaDaSaida{
+	all p: Portao | p.cancelaE != p.cancelaS
+}
+
+assert veiculoTemApenasUmProprietario{
+	all v: Veiculo | one v.proprietario
+}
+
+assert condominioTemApenasUmEstacionamento{
+	all c: Condominio | one c.estacionamento 
+}
+
+assert condominioTemPeloMenosUmMorador{
+	all c: Condominio | some c.morador
+}
+
+assert estacionamentoExisteApenasNoCondominio{
+	all g: Estacionamento | #estacionamento.g = 1
+}
+
+assert condominioTemApenasUmPortao{
+	all c: Condominio | one c.portao 
+}
+
+assert todoMoradorEstaEmUmCondominio {
+	all m:Morador | #morador.m = 1
+}
+
+assert todoSemaforoEstaEmUmPortao {
+	all s:Semaforo | s in Portao.semaforoE or s in Portao.semaforoS
+}
+
+assert semaforoDaEntradaEDiferenteDoSemaforoDaSaida{
+	all p: Portao | p.semaforoE != p.semaforoS
+}
+
+-- CHECKS
+check visitanteTemApenasUmCarro for 30
+check moradorTemNoMinUmEAteTresVeiculos for 30
+check veiculoEDeMoradorOuEDeVisitante for 30
+check veiculoNaoEVisitanteEDeMorador for 30
+check todaCancelaEstaEmUmPortao for 30
+check cancelaDaEntradaEDiferenteDaCancelaDaSaida for 30
+check veiculoTemApenasUmProprietario for 30
+check condominioTemApenasUmEstacionamento for 30
+check condominioTemPeloMenosUmMorador for 30
+check estacionamentoExisteApenasNoCondominio for 30
+check condominioTemApenasUmPortao for 30
+check todoMoradorEstaEmUmCondominio for 30
+check todoSemaforoEstaEmUmPortao for 30
+check semaforoDaEntradaEDiferenteDoSemaforoDaSaida for 30
 
 pred show[] {
 }
