@@ -7,10 +7,10 @@ one sig Condominio{
 }
 
 one sig Portao {
-	cancelaE:	one Cancela,				// cancela de entrada 
-	cancelaS: 	one Cancela,				// cancela de saida
-	semaforoE: 	one Semaforo,				// semaforo de entrada
-	semaforoS:	one Semaforo				// semaforo de saida
+	cancelaP:	one Cancela,				// primeira cancela
+	cancelaS: 	one Cancela,				// segunda cancela
+	semaforoE: 	one Semaforo,			// semaforo de entrada
+	semaforoS:	one Semaforo			// semaforo de saida
 }
 
 sig Cancela {}
@@ -58,8 +58,8 @@ fact todoMoradorPertenceAUmCondominio{
 	all m:Morador | #morador.m = 1
 }
 
-fact cancelaEDifetenteDeCancelaS {
-  all p:Portao | p.cancelaE != p.cancelaS
+fact cancelaPDifetenteDeCancelaS {
+  all p:Portao | p.cancelaP != p.cancelaS
 }
 
 fact semaforoEDiferenteSemaforoS {
@@ -71,12 +71,15 @@ fact TodoSemaforoTaEmUmPortao {
 }
 
 fact TodaCancelaTaEmUmPortao {
-  all c:Cancela | c in Portao.cancelaE or c in Portao.cancelaS
+  all c:Cancela | c in Portao.cancelaP or c in Portao.cancelaS
 }
 
+-- pode criar uma funcao que pega o morador que o visitante esta visitando
+-- e fazer all v:Visitante | (#proprietario.v + #proprietario.(funcao) ) < 4
 fact MoradorTemNoMinUmEAteTresVeiculos{
 	all m: Morador | #proprietario.m > 0
 	all m: Morador | #proprietario.m < 4
+--	all v:Visitante | some m: Morador | (#proprietario.v + #proprietario.m) < 4
 }
 
 fact VisitanteTemApenasUmCarro{
@@ -118,7 +121,8 @@ assert visitanteTemApenasUmCarro{
 
 assert moradorTemNoMinUmEAteTresVeiculos{
 	all m: Morador | #proprietario.m > 0
-	all m: Morador | #proprietario.m < 4
+--	all m: Morador | #proprietario.m < 4
+	all v:Visitante | some m: Morador | (#proprietario.v + #proprietario.m) < 4 
 }
 
 assert veiculoEDeMoradorOuEDeVisitante{
@@ -130,11 +134,11 @@ assert veiculoNaoEVisitanteEDeMorador {
 }
 
 assert todaCancelaEstaEmUmPortao {
-	all c:Cancela | c in Portao.cancelaS or c in Portao.cancelaE
+	all c:Cancela | c in Portao.cancelaS or c in Portao.cancelaP
 }
 
-assert cancelaDaEntradaEDiferenteDaCancelaDaSaida{
-	all p: Portao | p.cancelaE != p.cancelaS
+assert primeiraCancelaEDiferenteDaSegundaCancela{
+	all p: Portao | p.cancelaP != p.cancelaS
 }
 
 assert veiculoTemApenasUmProprietario{
@@ -168,14 +172,14 @@ assert todoSemaforoEstaEmUmPortao {
 assert semaforoDaEntradaEDiferenteDoSemaforoDaSaida{
 	all p: Portao | p.semaforoE != p.semaforoS
 }
-
+/*
 -- CHECKS
 check visitanteTemApenasUmCarro for 30
 check moradorTemNoMinUmEAteTresVeiculos for 30
 check veiculoEDeMoradorOuEDeVisitante for 30
 check veiculoNaoEVisitanteEDeMorador for 30
 check todaCancelaEstaEmUmPortao for 30
-check cancelaDaEntradaEDiferenteDaCancelaDaSaida for 30
+check primeiraCancelaEDiferenteDaSegundaCancela for 30
 check veiculoTemApenasUmProprietario for 30
 check condominioTemApenasUmEstacionamento for 30
 check condominioTemPeloMenosUmMorador for 30
@@ -184,7 +188,7 @@ check condominioTemApenasUmPortao for 30
 check todoMoradorEstaEmUmCondominio for 30
 check todoSemaforoEstaEmUmPortao for 30
 check semaforoDaEntradaEDiferenteDoSemaforoDaSaida for 30
-
+*/
 pred show[] {
 }
 run show
