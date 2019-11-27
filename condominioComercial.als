@@ -62,8 +62,6 @@ fun GetEstacionamentoVisitado[v:Visitante]: one Estacionamento {
 }
 
 -- FACTS
--- fazer uma fact para condominio ter no maximo 10 moradores
-
 fact todoMoradorPertenceAUmCondominio{
 	all m:Morador | #morador.m = 1
 }
