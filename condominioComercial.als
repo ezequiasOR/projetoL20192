@@ -7,8 +7,8 @@ one sig Condominio{
 }
 
 one sig Portao {
-	cancelaP:	one Cancela,				// primeira cancela
-	cancelaS: 	one Cancela,				// segunda cancela
+	cancelaP:	one Cancela,			// primeira cancela
+	cancelaS: 	one Cancela,			// segunda cancela
 	semaforoE: 	one Semaforo,			// semaforo de entrada
 	semaforoS:	one Semaforo			// semaforo de saida
 }
@@ -121,8 +121,8 @@ assert visitanteTemApenasUmCarro{
 
 assert moradorTemNoMinUmEAteTresVeiculos{
 	all m: Morador | #proprietario.m > 0
---	all m: Morador | #proprietario.m < 4
-	all v:Visitante | some m: Morador | (#proprietario.v + #proprietario.m) < 4 
+	all m: Morador | #proprietario.m < 4
+--	all v:Visitante | some m: Morador | (#proprietario.v + #proprietario.m) < 4 
 }
 
 assert veiculoEDeMoradorOuEDeVisitante{
