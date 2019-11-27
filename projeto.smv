@@ -2,3 +2,153 @@ MODULE main
 VAR
 	Pessoa:{Morador,Visitante};
 	Autorizacao:{AutorizacaoTrintaDias,AutorizacaoUmDia};
+	semaforoEntrada:boolean;
+  	semaforoSaida:boolean;
+  	estacionamento:process portao(semaforoEntrada, semaforoSaida);
+
+ASSIGN
+  	init(semaforoEntrada) := FALSE;
+  	init(semaforoSaida) := FALSE;
+	
+	INVARSPEC (estacionamento.estado = aguardando -> estacionamento.critico = FALSE);
+	INVARSPEC (estacionamento.estado = entrando -> estacionamento.critico = TRUE);
+	INVARSPEC (estacionamento.estado = saindo -> estacionamento.critico = TRUE);
+
+	
+	INVARSPEC (semaforoEntrada = TRUE -> semaforoSaida = FALSE);
+	INVARSPEC (semaforoSaida = TRUE -> semaforoEntrada = FALSE);
+
+	
+	INVARSPEC (estacionamento.flag_entrando = TRUE -> estacionamento.flag_saindo = FALSE)
+	INVARSPEC (estacionamento.flag_saindo = TRUE -> estacionamento.flag_entrando = FALSE)
+
+
+	INVARSPEC (estacionamento.estado = cP_aberta -> estacionamento.cancelaS = FALSE)
+	INVARSPEC (estacionamento.estado = cS_aberta -> estacionamento.cancelaP = FALSE)
+
+
+	INVARSPEC (estacionamento.vagas >= 0 & estacionamento.vagas <= 30)
+
+-------------------------------------------------------------------------------------------------
+
+MODULE portao(semaforoEntrada, semaforoSaida)
+VAR
+  estado : {aguardando, ocupado, entrando, saindo, cP_aberta, cP_fechada, cS_aberta, cS_fechada, livre};
+  cancelaE: boolean;
+  cancelaS: boolean;
+  critico: boolean;
+  flag_entrando: boolean;
+  flag_saindo: boolean;
+  vagas: 0 .. 30;
+
+ASSIGN
+  init(cancelaE) := FALSE;
+  init(cancela2) := FALSE;
+  init(critico) := FALSE;
+  init(flag_entrando) := FALSE;
+  init(flag_saindo) := FALSE;
+  init(vagas) := 0;
+
+  init(estado) := aguardando;
+  next(estado) := 
+  case 
+
+    estado = aguardando : {aguardando, ocupado};
+    estado = ocupado : {entrando, saindo};
+    
+-- Fluxo de entrada
+  -- Cancela Primeira
+    (estado = entrando) & (semaforoEntrada=TRUE) & (vagas < 30): cP_aberta;
+    (estado = cP_aberta) & (cancelaP=FALSE): cP_fechada;
+
+  --Cancela Segunda
+    (estado = cP_fechada) & (cancelaS=TRUE): cS_aberta;
+    (estado = cS_aberta) & (cancelaS=FALSE): cS_fechada;
+
+  --Fim da entrada
+    (estado = c2_fechada) & (flag_entrando=TRUE): livre;
+
+-- Fluxo de saida
+  --Cancela Segunda
+    (estado = saindo) & (semaforoSaida=TRUE) & (vagas > 0): cS_aberta;
+    (estado = cS_aberta) & (cancelaS=FALSE):  cS_fechada;
+
+  --Cancela Primeira
+    (estado = cS_fechada) & (cancelaP=TRUE):  cP_aberta;
+    (estado = cP_aberta) & (cancelaP=FALSE):  cP_fechada;
+
+  --Fim da saida
+    (estado = cP_fechada) & (flag_saindo=TRUE): livre;
+    
+    --Fim da operação
+    (estado = livre): aguardando;
+
+    TRUE : estado;
+    esac;
+  
+  next(semaforoEntrada) := 
+    case
+      (estado = entrando) & (vagas < 30): TRUE;
+      estado = saindo: FALSE;
+      estado = aguardando: FALSE;
+      TRUE : semaforoEntrada;
+    esac;
+
+  next(semaforoSaida) := 
+    case
+      estado = entrando: FALSE;
+      (estado = saindo) & (vagas > 0): TRUE;
+      estado = aguardando: FALSE;
+      TRUE : semaforoSaida;
+    esac;
+
+  next(cancelaP) :=
+    case
+      estado = entrando: TRUE;
+      estado = cP_aberta: FALSE;
+      estado = cS_fechada: TRUE;
+      estado = aguardando: FALSE;
+      TRUE: cancela1;
+    esac;
+
+  next(cancelaS) :=
+    case
+      estado = saindo: TRUE;
+      estado = cP_fechada: TRUE;
+      estado = cS_aberta: FALSE;
+      estado = aguardando: FALSE;
+      TRUE: cancela2;
+    esac;
+
+  next(critico) :=
+    case
+      estado = ocupado: TRUE;
+      estado = livre: FALSE;
+      TRUE : critico;
+    esac;
+
+  next(flag_entrando) :=
+    case
+      estado = entrando: TRUE;
+      estado = saindo: FALSE;
+      estado = aguardando: FALSE;
+      TRUE: flag_entrando;
+    esac;
+
+  next(flag_saindo) :=
+    case
+      estado = entrando: FALSE;
+      estado = saindo: TRUE;
+      estado = aguardando: FALSE;
+      TRUE: flag_saindo;
+    esac;
+
+  next(vagas) :=
+  case
+    (estado = livre) & (flag_entrando=TRUE) & (vagas < 30) : vagas + 1;
+    (estado = livre) & (flag_saindo=TRUE) & (vagas > 0): vagas - 1;
+    TRUE: vagas;
+  esac;
+
+FAIRNESS
+  running
