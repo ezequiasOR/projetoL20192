@@ -7,8 +7,8 @@ one sig Condominio{
 }
 
 one sig Portao {
-	cancelaP:	one Cancela,			// primeira cancela
-	cancelaS: 	one Cancela,			// segunda cancela
+	cancelaP:	one Cancela,				// primeira cancela
+	cancelaS: 	one Cancela,				// segunda cancela
 	semaforoE: 	one Semaforo,			// semaforo de entrada
 	semaforoS:	one Semaforo			// semaforo de saida
 }
@@ -45,6 +45,14 @@ sig AutorizacaoUmDia extends Autorizacao {
 }
 
 -- FUNCOES
+fun GetMoradorVisitado[v:Visitante]: one Morador {
+	v.visita
+}
+
+fun GetQtdVeiculosMorador[m:Morador]: Int {
+	#proprietario.m
+}
+
 fun GetCondominioMorador[m:Morador]: one Condominio {
 	morador.m
 }
@@ -54,6 +62,8 @@ fun GetEstacionamentoVisitado[v:Visitante]: one Estacionamento {
 }
 
 -- FACTS
+-- fazer uma fact para condominio ter no maximo 10 moradores
+
 fact todoMoradorPertenceAUmCondominio{
 	all m:Morador | #morador.m = 1
 }
@@ -74,12 +84,13 @@ fact TodaCancelaTaEmUmPortao {
   all c:Cancela | c in Portao.cancelaP or c in Portao.cancelaS
 }
 
--- pode criar uma funcao que pega o morador que o visitante esta visitando
--- e fazer all v:Visitante | (#proprietario.v + #proprietario.(funcao) ) < 4
 fact MoradorTemNoMinUmEAteTresVeiculos{
 	all m: Morador | #proprietario.m > 0
 	all m: Morador | #proprietario.m < 4
---	all v:Visitante | some m: Morador | (#proprietario.v + #proprietario.m) < 4
+}
+
+fact CadaMoradorOcupaNoMaxTresVagas {
+	all v: Visitante | (#proprietario.v + GetQtdVeiculosMorador[GetMoradorVisitado[v]]) < 4
 }
 
 fact VisitanteTemApenasUmCarro{
@@ -122,7 +133,6 @@ assert visitanteTemApenasUmCarro{
 assert moradorTemNoMinUmEAteTresVeiculos{
 	all m: Morador | #proprietario.m > 0
 	all m: Morador | #proprietario.m < 4
---	all v:Visitante | some m: Morador | (#proprietario.v + #proprietario.m) < 4 
 }
 
 assert veiculoEDeMoradorOuEDeVisitante{
