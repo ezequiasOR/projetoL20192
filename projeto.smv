@@ -25,7 +25,7 @@ ASSIGN
 	LTLSPEC G(F((estacionamento.estado = aguardando) -> (estacionamento.autorizacao = SemAutorizacao)));
 	
 	--Relação entre as duas cancelas e o espaço critico ocupado (espaco entre
-	as duas cancelas)
+	--as duas cancelas)
 	INVARSPEC (estacionamento.estado = aguardando -> estacionamento.critico = FALSE);
 	INVARSPEC (estacionamento.estado = entrando -> estacionamento.critico = TRUE);
 	INVARSPEC (estacionamento.estado = saindo -> estacionamento.critico = TRUE);
@@ -66,7 +66,7 @@ VAR
 
 ASSIGN
   	init(cancelaE) := FALSE;
-  	init(cancela2) := FALSE;
+  	init(cancelaS) := FALSE;
   	init(critico) := FALSE;
   	init(flag_entrando) := FALSE;
   	init(flag_saindo) := FALSE;
