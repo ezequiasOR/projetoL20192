@@ -55,7 +55,7 @@ VAR
   	estado : {aguardando, ocupado, entrando, saindo, cP_aberta, cP_fechada, cS_aberta, cS_fechada, livre};
   	autorizacao:{SemAutorizacao,AutorizacaoTrintaDias,AutorizacaoUmDia};
   	eMorador: boolean;
-  	cancelaE: boolean;
+  	cancelaP: boolean;
   	cancelaS: boolean;
   	critico: boolean;
   	flag_entrando: boolean;
@@ -109,7 +109,7 @@ ASSIGN
     (estado = cS_aberta) & (cancelaS=FALSE): cS_fechada;
 
   --Fim da entrada
-    (estado = c2_fechada) & (flag_entrando=TRUE): livre;
+    (estado = cS_fechada) & (flag_entrando=TRUE): livre;
 	
 
 -- Fluxo de saida
