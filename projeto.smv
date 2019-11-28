@@ -10,23 +10,28 @@ ASSIGN
   	init(semaforoEntrada) := FALSE;
   	init(semaforoSaida) := FALSE;
 	
+	--Relação entre as duas cancelas e o espaço critico ocupado (espaco entre
+	as duas cancelas)
 	INVARSPEC (estacionamento.estado = aguardando -> estacionamento.critico = FALSE);
 	INVARSPEC (estacionamento.estado = entrando -> estacionamento.critico = TRUE);
 	INVARSPEC (estacionamento.estado = saindo -> estacionamento.critico = TRUE);
 
 	
+	--Relação entre os dois semáforos.
 	INVARSPEC (semaforoEntrada = TRUE -> semaforoSaida = FALSE);
 	INVARSPEC (semaforoSaida = TRUE -> semaforoEntrada = FALSE);
 
 	
+	--Especificação das flags.
 	INVARSPEC (estacionamento.flag_entrando = TRUE -> estacionamento.flag_saindo = FALSE)
 	INVARSPEC (estacionamento.flag_saindo = TRUE -> estacionamento.flag_entrando = FALSE)
-
-
+	
+	
+	--Relação enter os portões
 	INVARSPEC (estacionamento.estado = cP_aberta -> estacionamento.cancelaS = FALSE)
 	INVARSPEC (estacionamento.estado = cS_aberta -> estacionamento.cancelaP = FALSE)
 
-
+	--Limite de vagas
 	INVARSPEC (estacionamento.vagas >= 0 & estacionamento.vagas <= 30)
 
 -------------------------------------------------------------------------------------------------
@@ -150,5 +155,7 @@ ASSIGN
     TRUE: vagas;
   esac;
 
-FAIRNESS
-  running
+
+
+		
+		
