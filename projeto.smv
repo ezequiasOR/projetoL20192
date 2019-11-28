@@ -1,7 +1,6 @@
 MODULE main
 VAR
-	Pessoa:{Morador,Visitante};
-	Autorizacao:{AutorizacaoTrintaDias,AutorizacaoUmDia};
+	pessoa:{Morador,Visitante};
 	semaforoEntrada:boolean;
   	semaforoSaida:boolean;
   	estacionamento:process portao(semaforoEntrada, semaforoSaida);
@@ -38,23 +37,47 @@ ASSIGN
 
 MODULE portao(semaforoEntrada, semaforoSaida)
 VAR
-  estado : {aguardando, ocupado, entrando, saindo, cP_aberta, cP_fechada, cS_aberta, cS_fechada, livre};
-  cancelaE: boolean;
-  cancelaS: boolean;
-  critico: boolean;
-  flag_entrando: boolean;
-  flag_saindo: boolean;
-  vagas: 0 .. 30;
+  	estado : {aguardando, ocupado, entrando, saindo, cP_aberta, cP_fechada, cS_aberta, cS_fechada, livre};
+  	autorizacao:{SemAutorizacao,AutorizacaoTrintaDias,AutorizacaoUmDia};
+  	eMorador: boolean;
+  	cancelaE: boolean;
+  	cancelaS: boolean;
+  	critico: boolean;
+  	flag_entrando: boolean;
+  	flag_saindo: boolean;
+  	vagas: 0..30;
+	moradores: 0..10;
+	visitantes: 0..20;
 
 ASSIGN
-  init(cancelaE) := FALSE;
-  init(cancela2) := FALSE;
-  init(critico) := FALSE;
-  init(flag_entrando) := FALSE;
-  init(flag_saindo) := FALSE;
-  init(vagas) := 0;
-
+  	init(cancelaE) := FALSE;
+  	init(cancela2) := FALSE;
+  	init(critico) := FALSE;
+  	init(flag_entrando) := FALSE;
+  	init(flag_saindo) := FALSE;
+	init(eMorador) := FALSE;
+  	init(vagas) := 0;
+	init(moradores) := 0;
+	init(visitantes) := 0;
+  
+  init(autorizacao) := SemAutorizacao;
   init(estado) := aguardando;
+   
+  next(autorizacao) :=
+  case
+	--Funcionamento Geral das Autorizações
+	autorizacao = SemAutorizacao: {AutorizacaoTrintaDias,AutorizacaoUmDia};
+	autorizacao = AutorizacaoTrintaDias: {SemAutorizacao};
+	autorizacao = AutorizacaoUmDia: {SemAutorizacao};
+
+	
+	--Recebimento da autorizacao
+	(autorizacao = SemAutorizacao) & (eMorador) & (estado = entrando): AutorizacaoTrintaDias;
+	(autorizacao = SemAutorizacao) & (!eMorador) & (estado = entrando): AutorizacaoUmDia;
+
+   TRUE: autorizacao;
+   esac;
+	
   next(estado) := 
   case 
 
@@ -63,7 +86,7 @@ ASSIGN
     
 -- Fluxo de entrada
   -- Cancela Primeira
-    (estado = entrando) & (semaforoEntrada=TRUE) & (vagas < 30): cP_aberta;
+    (estado = entrando) & (semaforoEntrada=TRUE) & (vagas < 30) & (autorizacao != SemAutorizacao): cP_aberta;
     (estado = cP_aberta) & (cancelaP=FALSE): cP_fechada;
 
   --Cancela Segunda
@@ -72,6 +95,7 @@ ASSIGN
 
   --Fim da entrada
     (estado = c2_fechada) & (flag_entrando=TRUE): livre;
+	
 
 -- Fluxo de saida
   --Cancela Segunda
@@ -113,7 +137,7 @@ ASSIGN
       estado = cP_aberta: FALSE;
       estado = cS_fechada: TRUE;
       estado = aguardando: FALSE;
-      TRUE: cancela1;
+      TRUE: cancelaP;
     esac;
 
   next(cancelaS) :=
@@ -122,7 +146,7 @@ ASSIGN
       estado = cP_fechada: TRUE;
       estado = cS_aberta: FALSE;
       estado = aguardando: FALSE;
-      TRUE: cancela2;
+      TRUE: cancelaS;
     esac;
 
   next(critico) :=
