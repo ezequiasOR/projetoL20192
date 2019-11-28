@@ -65,7 +65,7 @@ VAR
 	visitantes: 0..20;
 
 ASSIGN
-  	init(cancelaE) := FALSE;
+  	init(cancelaP) := FALSE;
   	init(cancelaS) := FALSE;
   	init(critico) := FALSE;
   	init(flag_entrando) := FALSE;
