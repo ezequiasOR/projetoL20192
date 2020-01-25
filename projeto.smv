@@ -16,13 +16,13 @@ ASSIGN
 	esac;
 
 	
-	LTLSPEC G(F(pessoa = Morador -> estacionamento.eMorador = TRUE));
-	LTLSPEC G(F(pessoa = Visitante -> estacionamento.eMorador = FALSE));
+	---LTLSPEC G(F(pessoa = Morador -> estacionamento.eMorador = TRUE));
+	---LTLSPEC G(F(pessoa = Visitante -> estacionamento.eMorador = FALSE));
 
-	LTLSPEC G(F((estacionamento.eMorador = TRUE & estacionamento.estado = entrando) -> (estacionamento.autorizacao = AutorizacaoTrintaDias)));
-	LTLSPEC G(F((estacionamento.eMorador = FALSE & estacionamento.estado = entrando) -> (estacionamento.autorizacao = AutorizacaoUmDia)));
+	---LTLSPEC G(F((estacionamento.eMorador = TRUE & estacionamento.estado = entrando) -> (estacionamento.autorizacao = AutorizacaoTrintaDias)));
+	---LTLSPEC G(F((estacionamento.eMorador = FALSE & estacionamento.estado = entrando) -> (estacionamento.autorizacao = AutorizacaoUmDia)));
 
-	LTLSPEC G(F((estacionamento.estado = aguardando) -> (estacionamento.autorizacao = SemAutorizacao)));
+	---LTLSPEC G(F((estacionamento.estado = aguardando) -> (estacionamento.autorizacao = SemAutorizacao)));
 	
 	--Relação entre as duas cancelas e o espaço critico ocupado (espaco entre
 	--as duas cancelas)
